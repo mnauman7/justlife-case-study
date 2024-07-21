@@ -1,0 +1,37 @@
+<div class="container-fluid">
+  <div class="container xd-container">
+
+    <h2>User Information</h2>
+
+
+    <table class="table table-striped">
+      <tr>
+        <th>Name</th>
+        <td><b class="userFullName">{{ user.firstName }} {{ user.lastName }}</b></td>
+      </tr>
+      <tr>
+        <th>Address</th>
+        <td>{{ user.address }}</td>
+      </tr>
+      <tr>
+        <th>City</th>
+        <td>{{ user.city }}</td>
+      </tr>
+      <tr>
+        <th>Telephone</th>
+        <td>{{ user.telephone }}</td>
+      </tr>
+    </table>
+
+    <div>
+      <button class="btn btn-default" (click)="editUser()">Edit User</button>
+      &nbsp;
+      <button class="btn btn-default" (click)="deactivateUser()">Deactivate User</button>
+    </div>
+    &nbsp;
+    <div>
+      <button class="btn btn-default" (click)="gotoUsersList()">Back</button>
+    </div>
+    
+  </div>
+</div>

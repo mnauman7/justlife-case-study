@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+
+  app-server:
+    image: justlife-case-study-app
+    container_name: app-server
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    depends_on:
+      db-server:
+        condition: service_started
+    ports:
+      - 5050:5050
+    environment:
+      - "SPRING_PROFILES_ACTIVE=docker"
+      - "SPRING_DATASOURCE_URL=jdbc:mysql://db-server:3306/app_db?useSSL=false&allowPublicKeyRetrieval=true"
+      - "SPRING_DATASOURCE_USERNAME=app_server"
+      - "SPRING_DATASOURCE_PASSWORD=apppassword"
+
+
+  ui-service:
+    image: justlife-case-study-angular
+    container_name: web-service
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    ports:
+      - 4000:8080
+
+  ## MySQL instance 
+  db-server:
+    image: mysql:8.1
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - '3306:3306'
+    # Using volumes to persist data on restart
+    # Running init scripts in database folder to setup database scheme and data for the first time
+    volumes:
+      - justlife-case-study-mysql-db:/var/lib/mysql
+      - "./database/schema.sql:/docker-entrypoint-initdb.d/1.sql"
+      - "./database/data.sql:/docker-entrypoint-initdb.d/2.sql"
+      
+volumes:
+  justlife-case-study-mysql-db:
+    name: justlife-case-study-mysql-db

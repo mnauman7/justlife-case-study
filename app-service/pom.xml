@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.nauman</groupId>
+  <artifactId>justlife-case-study-app</artifactId>
+  <packaging>jar</packaging>
+  <description>JustLife Case Study App By Nauman</description>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.2.4</version>
+  </parent>
+
+  <properties>
+    <java.version>17</java.version>
+    
+    <!-- Properties used by plugin to generate docker image -->
+    <docker.exposed.port>8081</docker.exposed.port>
+    <docker.image.dockerfile.dir>${basedir}/../docker</docker.image.dockerfile.dir>
+    <docker.image.exposed.port>9090</docker.image.exposed.port>
+
+    <container.executable>docker</container.executable>
+    <!-- By default value is linux/amd64, For Apple Silicon M2 Chip use linux/arm64 -->
+    <container.platform>linux/arm64</container.platform>
+    <!-- The -load option is a shortcut for or -output=type=docker -->
+    <container.build.extraarg>--load</container.build.extraarg>
+  </properties>
+
+
+  <dependencies>
+	
+      <!-- Spring Boot Web -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-web</artifactId>
+      </dependency>
+      
+      <!-- Database -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-data-jpa</artifactId>
+      </dependency>
+      
+      <dependency>
+          <groupId>com.mysql</groupId>
+          <artifactId>mysql-connector-j</artifactId>
+          <scope>runtime</scope>
+      </dependency>
+      
+      
+      <!-- Testing -->
+      <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-test</artifactId>
+          <scope>test</scope>
+      </dependency>
+      
+      
+       <!-- Security -->
+      <dependency>
+		  <groupId>org.springframework.boot</groupId>
+		  <artifactId>spring-boot-starter-security</artifactId>
+	  </dependency>
+	  
+	  <dependency>
+		  <groupId>com.auth0</groupId>
+		  <artifactId>java-jwt</artifactId>
+		  <version>4.2.1</version>
+	  </dependency>
+	  
+      
+      <!-- Others -->  
+      <dependency>
+          <groupId>org.modelmapper</groupId>
+          <artifactId>modelmapper</artifactId>
+          <version>3.1.1</version>
+      </dependency>
+      
+  </dependencies>
+  
+  
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+
+  <profiles>
+        <profile>
+            <id>buildDocker</id>
+            <build>
+                <plugins>
+					<!-- This Plugin generates docker image -->  
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>docker-build</id>
+                                <phase>install</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${container.executable}</executable>
+                                    <workingDirectory>${docker.image.dockerfile.dir}</workingDirectory>
+                                    <arguments>
+                                        <argument>build</argument>
+                                        <argument>-f</argument>
+                                        <argument>Dockerfile</argument>
+                                        <argument>--build-arg</argument>
+                                        <argument>ARTIFACT_NAME=${project.build.finalName}</argument>
+                                        <argument>--build-arg</argument>
+                                        <argument>EXPOSED_PORT=${docker.image.exposed.port}</argument>
+                                        <argument>--platform</argument>
+                                        <argument>${container.platform}</argument>
+                                        <argument>${container.build.extraarg}</argument>
+                                        <argument>-t</argument>
+                                        <argument>${project.artifactId}</argument>
+                                        <argument>${project.build.directory}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+  
+</project>
