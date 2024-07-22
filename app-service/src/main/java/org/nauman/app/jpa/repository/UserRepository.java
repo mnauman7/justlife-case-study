@@ -14,8 +14,8 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 	
 	public List<UserEntity> findByIsActive(Boolean isActive);
 	
-	public List<UserEntity> findByFirstNameContainsOrLastNameContainsOrAddressContainsOrCityContainsOrTelephoneContains(
-			String firstName, String lastName, String address, String city, String telephone);
+	public List<UserEntity> findByFirstNameContainsOrLastNameContainsOrAddressContainsOrCityContainsOrPhoneContains(
+			String firstName, String lastName, String address, String city, String phone);
 	
 	@Modifying
 	@Query("UPDATE UserEntity u SET u.isActive = :isActive WHERE u.id = :userId")

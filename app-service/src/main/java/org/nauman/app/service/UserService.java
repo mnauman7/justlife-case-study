@@ -99,7 +99,7 @@ public class UserService {
 		
 		try {
 			List<UserEntity> userEntityList =
-					userRepository.findByFirstNameContainsOrLastNameContainsOrAddressContainsOrCityContainsOrTelephoneContains(
+					userRepository.findByFirstNameContainsOrLastNameContainsOrAddressContainsOrCityContainsOrPhoneContains(
 							search,search,search,search,search);
 			
 			List<UserViewDTO> userDTOList = modelMapper.map(userEntityList, new TypeToken<List<UserViewDTO>>() {}.getType());

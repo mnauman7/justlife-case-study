@@ -60,7 +60,7 @@ public class UserServiceTest {
 		user.setLastName("Mohd");
 		user.setAddress("Street 16");
 		user.setCity("London");
-		user.setTelephone("0123456789");
+		user.setPhone("0123456789");
 		user.setIsActive(true);
 		user.setIsAdmin(false);
 		
@@ -74,7 +74,7 @@ public class UserServiceTest {
 		user.setLastName("Mohd");
 		user.setAddress("Street 16");
 		user.setCity("London");
-		user.setTelephone("0123456789");
+		user.setPhone("0123456789");
 		user.setIsActive(true);
 		user.setIsAdmin(false);
 		

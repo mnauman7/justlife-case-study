@@ -8,11 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "user")
+@Table(name = "Users")
 public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id", unique = true, nullable = false)
     private Integer id;
     
 	@Column(name = "first_name", nullable = false)
@@ -27,8 +28,8 @@ public class UserEntity {
     @Column(name = "city")
     private String city;
     
-    @Column(name = "telephone")
-    private String telephone;
+    @Column(name = "phone")
+    private String phone;
     
     @Column(name = "is_admin", columnDefinition = "TINYINT(1)")
     private Boolean isAdmin;
@@ -84,12 +85,12 @@ public class UserEntity {
 		this.city = city;
 	}
 
-	public String getTelephone() {
-		return telephone;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setTelephone(String telephone) {
-		this.telephone = telephone;
+	public void setPhone(String telephone) {
+		this.phone = telephone;
 	}
 
 	public Boolean getIsAdmin() {

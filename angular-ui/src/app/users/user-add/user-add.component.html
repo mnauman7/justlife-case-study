@@ -41,14 +41,14 @@
           <span class="help-block" *ngIf="city.dirty && city.hasError('required')">City is required</span>
         </div>
       </div>
-      <div class="form-group has-feedback" [class.has-success]="telephone.dirty && telephone.valid" [class.has-error]="telephone.dirty && !telephone.valid">
-        <label for="telephone" class="col-sm-2 control-label">Telephone</label>
+      <div class="form-group has-feedback" [class.has-success]="phone.dirty && phone.valid" [class.has-error]="phone.dirty && !phone.valid">
+        <label for="phone" class="col-sm-2 control-label">Phone</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="telephone" [(ngModel)]="user.telephone" name="telephone" required maxlength="10" pattern="^[0-9]{0,10}$" #telephone="ngModel"/>
-          <span class="glyphicon form-control-feedback" [class.glyphicon-ok]="telephone.valid" [class.glyphicon-remove]="!telephone.valid" aria-hidden="true"></span>
-          <span class="help-block" *ngIf="telephone.dirty && telephone.hasError('required')">Phone number is required</span>
-          <span class="help-block" *ngIf="telephone.dirty && telephone.hasError('maxlength')">Phone number cannot be more than 10 digits long</span>
-          <span class="help-block" *ngIf="telephone.dirty && telephone.hasError('pattern')" >Phone number only accept digits</span>
+          <input type="text" class="form-control" id="phone" [(ngModel)]="user.phone" name="phone" required maxlength="14" pattern="^[0-9]{0,14}$" #phone="ngModel"/>
+          <span class="glyphicon form-control-feedback" [class.glyphicon-ok]="phone.valid" [class.glyphicon-remove]="!phone.valid" aria-hidden="true"></span>
+          <span class="help-block" *ngIf="phone.dirty && phone.hasError('required')">Phone number is required</span>
+          <span class="help-block" *ngIf="phone.dirty && phone.hasError('maxlength')">Phone number cannot be more than 10 digits long</span>
+          <span class="help-block" *ngIf="phone.dirty && phone.hasError('pattern')" >Phone number only accept digits</span>
         </div>
       </div>
 

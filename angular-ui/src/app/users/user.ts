@@ -4,7 +4,7 @@ export interface User {
   lastName: string;
   address: string;
   city: string;
-  telephone: string;
+  phone: string;
   isAdmin: boolean;
   email: string;
   password: string;
