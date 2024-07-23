@@ -1,0 +1,79 @@
+<div class="container-fluid">
+  <div class="container xd-container">
+    <h2>Find Available Appointments</h2>
+
+    <form method="get"
+          class="form-horizontal" id="search-user-form">
+      <span class="form-group">
+          <div class="col-sm-10">
+            <label class="form-label"><b>Appointment Date</b></label>
+            <input type="date" class="form-control" id="date" name="date" [(ngModel)]="selectedDate"/>
+          </div>
+
+          <div style="margin-top:15px" class="col-sm-10">
+            <label class="form-label"><b>Service Type</b></label>
+            <input type="text" class="form-control" id="firstName" value="Cleaning" disabled/>
+          </div>
+
+          <div style="margin-top:15px" class="col-sm-10">
+            <label class="form-label"><b>Hours of Service</b></label><br>
+
+            <!-- <select [(ngModel)]="category" id="category"> -->
+            <select id="serviceHours" name="serviceHours" [(ngModel)]="serviceHours" class="col-sm-3">
+              <option [ngValue]="2" selected>2</option>
+              <option [ngValue]="4" >4</option>
+            </select>
+          </div>
+
+          <div style="margin-top:15px" class="col-sm-10">
+            <label class="form-label"><b>Number of Professionals</b></label><br>
+
+            <!-- <select [(ngModel)]="category" id="category"> -->
+            <select id="numberOfProfessionals" name="numberOfProfessionals"  [(ngModel)]="numberOfProfessionals" class="col-sm-3">
+              <option [ngValue]="1" selected>1</option>
+              <option [ngValue]="2" >2</option>
+              <option [ngValue]="3" >3</option>
+            </select>
+          </div>
+      </span>
+    </form>
+
+    <div *ngIf="!availableSlots">No available slots found with your filters</div>
+    <div>
+      <button class="btn btn-default" (click)="getAvailableSlots()">Find Appointments</button>
+    </div>
+    &nbsp;
+    <div class="table-responsive" id="usersTable"  *ngIf="availableSlots">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Service</th>
+          <th>Date</th>
+          <th>Start Time</th>
+          <th>Staff</th>
+          <th>Book</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let slot of availableSlots">
+          <td>Cleaning</td>
+          <td>{{ slot.date }}</td>
+          <td>{{ slot.startingTime }}</td>
+          <td>          
+            <select>
+              <option *ngFor="let staff of slot.availableStaff">
+                {{staff.firstName}} {{staff.lastName}} 
+              </option>
+            </select>
+          </td>
+          <td class="bookThis"><a (click)="onSelect()">Book This Slot</a></td>
+          <td>
+        </td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

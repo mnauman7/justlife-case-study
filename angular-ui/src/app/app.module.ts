@@ -12,6 +12,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthenticationGuard } from './auth/auth-guard';
 import { HeaderComponent } from './app-header/app-header.component';
 import { JwtInterceptor } from './auth/jwt-intercepter';
+import { BookingModule } from './booking/booking.module';
 
 
 @NgModule({
@@ -24,6 +25,7 @@ import { JwtInterceptor } from './auth/jwt-intercepter';
     FormsModule,
     HttpClientModule,
     UsersModule,
+    BookingModule,
     AuthModule,
     PartsModule,
     BrowserAnimationsModule,

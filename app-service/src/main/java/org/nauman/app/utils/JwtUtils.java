@@ -12,7 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 public class JwtUtils {
 
 	// @Value("${jwt.token-validity-days}")
-	private static Integer tokenValidMinutes = 10;
+	private static Integer tokenValidMinutes = 100;
 
 	// @Value("${jwt.issuer}")
 	private static String issuer = "Nauman";
