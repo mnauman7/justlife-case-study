@@ -48,7 +48,7 @@ VALUES
 ('Kole', 'Liu', '00923334445586', 1, 5);
 
 
--- Setting up time slots (for booking)
+-- Setting up time slots (for bookings)
 INSERT INTO app_db.`TimeSlots`
 (start_time, end_time, slot_name)
 VALUES
@@ -85,4 +85,4 @@ VALUES
 -- Setting up staff occupancy types
 INSERT INTO app_db.`StaffOccupancyTypeMaster`
 (occupancy_type_id, occupancy_type_name)
-VALUES(1, 'Work'),(2, 'Travelling/Preparing'),(3, 'Vehicle is Busy'),(4, 'Break'),(5, 'Leave');
+VALUES(1, 'Work'),(2, 'Travelling'),(3, 'Vehicle Busy'),(4, 'Break'),(5, 'Leave');

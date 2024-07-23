@@ -1,18 +1,16 @@
 package org.nauman.app.model;
 
-import java.sql.Time;
+import java.time.LocalTime;
 
-public class TimeSlotsDTO {
+public class TimeSlotDTO {
 	
 	private Integer slotId;
 	
-	private Time startTime;
+	private LocalTime startTime;
 	
-	private Time endTime;
+	private LocalTime endTime;
 	
 	private String slotName;
-	
-	private Boolean isActive;
 
 	
 	public Integer getSlotId() {
@@ -23,19 +21,19 @@ public class TimeSlotsDTO {
 		this.slotId = slotId;
 	}
 
-	public Time getStartTime() {
+	public LocalTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Time startTime) {
+	public void setStartTime(LocalTime startTime) {
 		this.startTime = startTime;
 	}
 
-	public Time getEndTime() {
+	public LocalTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Time endTime) {
+	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
 	}
 
@@ -45,14 +43,6 @@ public class TimeSlotsDTO {
 
 	public void setSlotName(String slotName) {
 		this.slotName = slotName;
-	}
-
-	public Boolean getIsActive() {
-		return isActive;
-	}
-
-	public void setIsActive(Boolean isActive) {
-		this.isActive = isActive;
 	}
 	
 }

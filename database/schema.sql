@@ -49,8 +49,7 @@ CREATE TABLE IF NOT EXISTS TimeSlots (
   slot_id TINYINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   start_time TIME NOT NULL,
   end_time TIME NOT NULL,
-  slot_name VARCHAR(20) NOT NULL,
-  is_active BOOL NOT NULL DEFAULT 1
+  slot_name VARCHAR(20) NOT NULL
 ) engine=InnoDB;
 
 CREATE TABLE IF NOT EXISTS Appointments (
@@ -58,6 +57,7 @@ CREATE TABLE IF NOT EXISTS Appointments (
   user_id BIGINT UNSIGNED NOT NULL,
   starting_time_id TINYINT UNSIGNED NOT NULL,
   duration TINYINT UNSIGNED NOT NULL,
+  appointment_date DATETIME NOT NULL,
   service_type TINYINT UNSIGNED NOT NULL,
   vehicle_id INT(4) UNSIGNED NOT NULL,
   address VARCHAR(255),
@@ -78,14 +78,15 @@ CREATE TABLE IF NOT EXISTS AppointmentStaff (
   FOREIGN KEY (staff_id) REFERENCES Staff(staff_id)
 ) engine=InnoDB;
 
-CREATE TABLE IF NOT EXISTS StaffTimeSlotsOccupancy (
+CREATE TABLE IF NOT EXISTS StaffOccupancy (
   occupancy_id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   staff_id INT(4) UNSIGNED NOT NULL,
   time_slot_id TINYINT UNSIGNED NOT NULL,
   occupancy_date DATE NOT NULL,
   occupancy_type_id TINYINT UNSIGNED NOT NULL,
   FOREIGN KEY (staff_id) REFERENCES Staff(staff_id),
-  FOREIGN KEY (time_slot_id) REFERENCES TimeSlots(slot_id)
+  FOREIGN KEY (time_slot_id) REFERENCES TimeSlots(slot_id),
+  FOREIGN KEY (occupancy_type_id) REFERENCES StaffOccupancyTypeMaster(occupancy_type_id)
 ) engine=InnoDB;
 
 CREATE TABLE IF NOT EXISTS StaffOccupancyTypeMaster (

@@ -1,5 +1,7 @@
 package org.nauman.app.jpa.entity;
 
+import java.util.Date;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -28,6 +30,9 @@ public class AppointmentEntity {
     @Column(name = "duration", nullable = false)
     private Integer duration;
     
+    @Column(name = "appointment_date", nullable = false)
+    private Date appointmentDate;
+    
     @Column(name = "service_type", nullable = false)
     private Integer serviceType;
     
@@ -46,7 +51,7 @@ public class AppointmentEntity {
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "starting_time_id", insertable = false, updatable = false)
-    private TimeSlotsEntity timeSlots;
+    private TimeSlotEntity timeSlots;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "service_type", insertable = false, updatable = false)
@@ -129,11 +134,11 @@ public class AppointmentEntity {
 		this.user = user;
 	}
 
-	public TimeSlotsEntity getTimeSlots() {
+	public TimeSlotEntity getTimeSlots() {
 		return timeSlots;
 	}
 
-	public void setTimeSlots(TimeSlotsEntity timeSlots) {
+	public void setTimeSlots(TimeSlotEntity timeSlots) {
 		this.timeSlots = timeSlots;
 	}
 
@@ -151,6 +156,14 @@ public class AppointmentEntity {
 
 	public void setVehicle(VehicleEntity vehicle) {
 		this.vehicle = vehicle;
+	}
+
+	public Date getAppointmentDate() {
+		return appointmentDate;
+	}
+
+	public void setAppointmentDate(Date appointmentDate) {
+		this.appointmentDate = appointmentDate;
 	}
     
 }
