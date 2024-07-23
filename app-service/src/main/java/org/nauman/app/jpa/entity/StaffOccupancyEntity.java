@@ -1,12 +1,17 @@
 package org.nauman.app.jpa.entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -25,11 +30,10 @@ public class StaffOccupancyEntity {
     private Integer timeSlotId;
     
     @Column(name = "occupancy_date", nullable = false)
-    private Date occupancyDate;
+    private LocalDate occupancyDate;
     
     @Column(name = "occupancy_type_id", nullable = false)
     private Integer occupancyTypeId;
-    
     
 
 	public Integer getOccupancyId() {
@@ -56,11 +60,11 @@ public class StaffOccupancyEntity {
 		this.timeSlotId = timeSlotId;
 	}
 
-	public Date getOccupancyDate() {
+	public LocalDate getOccupancyDate() {
 		return occupancyDate;
 	}
 
-	public void setOccupancyDate(Date occupancyDate) {
+	public void setOccupancyDate(LocalDate occupancyDate) {
 		this.occupancyDate = occupancyDate;
 	}
 
@@ -72,4 +76,5 @@ public class StaffOccupancyEntity {
 		this.occupancyTypeId = occupancyTypeId;
 	}
     
+	
 }

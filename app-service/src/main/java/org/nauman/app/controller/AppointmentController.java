@@ -30,8 +30,8 @@ public class AppointmentController {
 	
 	@GetMapping("/available-slots")
 	public List<AvailableSlotsDTO>  getAvailableSlots(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") String date,
-			@RequestParam(name = "service-hours", required = false) String serviceHours,
-			@RequestParam(name = "professionals", required = false) String numberOfProfessionals) {
+			@RequestParam(name = "service-hours", required = false) Integer serviceHours,
+			@RequestParam(name = "professionals", required = false) Integer numberOfProfessionals) {
 		
 		return appointmentService.getAvailableSlots(date, serviceHours, numberOfProfessionals);
 	}

@@ -6,10 +6,11 @@ import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { HandleError, HttpErrorHandler } from '../error.service';
 import { AvailableSlots } from './available-slots';
+import { AppointmentRequest } from './appointment-request';
 
 @Injectable()
 export class BookingService {
-  entityUrl = environment.REST_API_URL + 'booking';
+  entityUrl = environment.REST_API_URL + 'appointment';
 
   private readonly handlerError: HandleError;
 
@@ -17,50 +18,14 @@ export class BookingService {
     private http: HttpClient,
     private httpErrorHandler: HttpErrorHandler
   ) {
-    this.handlerError = httpErrorHandler.createHandleError('UserService');
-  }
-
-  getUsers(): Observable<Booking[]> {
-    return this.http
-      .get<Booking[]>(this.entityUrl)
-      .pipe(catchError(this.handlerError('getUsers', [])));
-  }
-
-  getUserById(userId: number): Observable<Booking> {
-    return this.http
-      .get<Booking>(this.entityUrl + '/' + userId)
-      .pipe(catchError(this.handlerError('getUserById', {} as Booking)));
-  }
-
-  getUserDetails(userId: number): Observable<Booking> {
-    return this.http
-      .get<Booking>(this.entityUrl + '/' + userId + '/details')
-      .pipe(catchError(this.handlerError('getUserById', {} as Booking)));
-  }
-
-  addUser(user: Booking): Observable<Booking> {
-    return this.http
-      .post<Booking>(this.entityUrl, user)
-      .pipe(catchError(this.handlerError('addUser', user)));
+    this.handlerError = httpErrorHandler.createHandleError('BookingService');
   }
 
 
-  updateUser(userId: string, user: Booking): Observable<{}> {
+  createAppointment(appointment: AppointmentRequest): Observable<{}> {
     return this.http
-      .put<Booking>(this.entityUrl + '/' + userId, user)
-      .pipe(catchError(this.handlerError('updateUser', user)));
-  }
-
-  deleteUser(userId: string): Observable<{}> {
-    return this.http
-      .delete<Booking>(this.entityUrl + '/' + userId)
-      .pipe(catchError(this.handlerError('deleteUser', [userId])));
-  }
-
-  updateUserActiveStatus(userId: string, isActive: boolean): Observable<{}> {
-    return this.http
-      .put<Booking>(this.entityUrl + '/' + userId + '/active?isActive=' + isActive, null)
-      .pipe(catchError(this.handlerError('updateUserActiveStatus')));
+      .post<AppointmentRequest>(this.entityUrl, appointment)
+      .pipe(catchError(this.handlerError('createAppointment', appointment)));
   }
 
   getAvailableSlots(selectedDate: Date, serviceHours: number, professionals: number): Observable<AvailableSlots[]> {
@@ -69,7 +34,7 @@ export class BookingService {
     }
 
     let url = this.entityUrl + '/available-slots?date=' + selectedDate;
-    
+
     if (serviceHours !== undefined) {
       url += '&service-hours=' + serviceHours;
     }

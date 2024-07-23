@@ -4,6 +4,7 @@ import { finalize } from 'rxjs/operators';
 import { Booking } from '../booking';
 import { BookingService } from '../booking.service';
 import { AvailableSlots } from '../available-slots';
+import { AppointmentRequest } from '../appointment-request';
 
 @Component({
   selector: 'app-booking-list',
@@ -26,8 +27,29 @@ export class BookingListComponent implements OnInit {
   ngOnInit() {
   }
 
-  onSelect() {
-    this.router.navigate(['/users']);
+  bookAppointment(slot: AvailableSlots) {
+    const appointmentRequest: AppointmentRequest = {
+      userId: 1,
+      startingTimeId: slot.startingTimeId,
+      duration: slot.duration,
+      appointmentDate: slot.date,
+      serviceTypeId: 1,
+      vehicleId: 1,
+      address: "Test place",
+      city: "Test City",
+      requiredStaff: slot.availableStaff.slice(0,2)
+    };
+    
+    this.bookingService.createAppointment(appointmentRequest).subscribe(
+      newAppointment => {
+        this.gotoAppointmentList();
+      },
+      error => this.errorMessage = error as any
+    );
+  }
+
+  gotoAppointmentList() {
+    this.router.navigate(['welcome']);
   }
 
   getAvailableSlots()

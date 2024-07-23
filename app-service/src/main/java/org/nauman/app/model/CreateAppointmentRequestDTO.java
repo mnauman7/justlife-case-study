@@ -1,6 +1,6 @@
 package org.nauman.app.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public class CreateAppointmentRequestDTO {
@@ -11,7 +11,7 @@ public class CreateAppointmentRequestDTO {
 	
 	private Integer duration;
 	
-	private Date appointmentDate;
+	private LocalDate appointmentDate;
 	
 	private Integer serviceTypeId;
 	
@@ -77,7 +77,7 @@ public class CreateAppointmentRequestDTO {
 	}
 
 	public void setCity(String city) {
-		city = city;
+		this.city = city;
 	}
 
 	public List<StaffDTO> getRequiredStaff() {
@@ -88,11 +88,11 @@ public class CreateAppointmentRequestDTO {
 		this.requiredStaff = requiredStaff;
 	}
 
-	public Date getAppointmentDate() {
+	public LocalDate getAppointmentDate() {
 		return appointmentDate;
 	}
 
-	public void setAppointmentDate(Date appointmentDate) {
+	public void setAppointmentDate(LocalDate appointmentDate) {
 		this.appointmentDate = appointmentDate;
 	}
 	

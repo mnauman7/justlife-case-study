@@ -6,9 +6,13 @@ public class AvailableSlotsDTO {
 	
 	private String startingTime;
 	
+	private Integer startingTimeId;
+	
+	private Integer duration;
+	
 	private String date;
 	
-	private List<StaffDTO> availableStaff;
+	private List<StaffBookingDTO> availableStaff;
 	
 
 	public String getStartingTime() {
@@ -27,12 +31,30 @@ public class AvailableSlotsDTO {
 		this.date = date;
 	}
 
-	public List<StaffDTO> getAvailableStaff() {
+	public List<StaffBookingDTO> getAvailableStaff() {
 		return availableStaff;
 	}
 
-	public void setAvailableStaff(List<StaffDTO> availableStaff) {
+	public void setAvailableStaff(List<StaffBookingDTO> availableStaff) {
 		this.availableStaff = availableStaff;
 	}
+
+	public Integer getStartingTimeId() {
+		return startingTimeId;
+	}
+
+	public void setStartingTimeId(Integer startingTimeId) {
+		this.startingTimeId = startingTimeId;
+	}
+
+	public Integer getDuration() {
+		return duration;
+	}
+
+	public void setDuration(Integer duration) {
+		this.duration = duration;
+	}
+	
+	
 	
 }

@@ -1,5 +1,7 @@
 package org.nauman.app.jpa.entity;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -24,14 +26,14 @@ public class AppointmentEntity {
     @Column(name = "user_id", nullable = false)
     private Integer userId;
     
-    @Column(name = "starting_time_id", nullable = false)
-    private Integer startingTimeId;
+    @Column(name = "start_time_slot_id", nullable = false)
+    private Integer startTimeSlotId;
     
     @Column(name = "duration", nullable = false)
     private Integer duration;
     
     @Column(name = "appointment_date", nullable = false)
-    private Date appointmentDate;
+    private LocalDate appointmentDate;
     
     @Column(name = "service_type", nullable = false)
     private Integer serviceType;
@@ -44,6 +46,12 @@ public class AppointmentEntity {
     
     @Column(name = "city")
     private String city;
+    
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
+    
+    @Column(name = "updated_date")
+    private LocalDateTime updatedDate;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
@@ -78,12 +86,12 @@ public class AppointmentEntity {
 		this.userId = userId;
 	}
 
-	public Integer getStartingTimeId() {
-		return startingTimeId;
+	public Integer getStartTimeSlotId() {
+		return startTimeSlotId;
 	}
 
-	public void setStartingTimeId(Integer startingTimeId) {
-		this.startingTimeId = startingTimeId;
+	public void setStartTimeSlotId(Integer startingTimeId) {
+		this.startTimeSlotId = startingTimeId;
 	}
 
 	public Integer getDuration() {
@@ -158,12 +166,30 @@ public class AppointmentEntity {
 		this.vehicle = vehicle;
 	}
 
-	public Date getAppointmentDate() {
+	public LocalDate getAppointmentDate() {
 		return appointmentDate;
 	}
 
-	public void setAppointmentDate(Date appointmentDate) {
+	public void setAppointmentDate(LocalDate appointmentDate) {
 		this.appointmentDate = appointmentDate;
 	}
+
+	public LocalDateTime getCreatedDate() {
+		return createdDate;
+	}
+
+	public void setCreatedDate(LocalDateTime createdDate) {
+		this.createdDate = createdDate;
+	}
+
+	public LocalDateTime getUpdatedDate() {
+		return updatedDate;
+	}
+
+	public void setUpdatedDate(LocalDateTime updatedDate) {
+		this.updatedDate = updatedDate;
+	}
+	
+	
     
 }

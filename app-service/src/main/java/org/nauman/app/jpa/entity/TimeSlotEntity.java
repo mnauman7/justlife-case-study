@@ -60,4 +60,5 @@ public class TimeSlotEntity {
 		this.slotName = slotName;
 	}
 	
+	
 }
