@@ -17,7 +17,20 @@ public interface StaffRepository extends JpaRepository<StaffEntity, Integer> {
 	
 	public List<StaffIdView> findStaffIdByVehicleIdAndIsActive(Integer vehicleId, Boolean isActive);
 	
-	//query not supported by JPQL
+	/**
+	 * 
+	 * This method runs a query to check what staff are not occupied with other tasks.
+	 * Staff are occupied for a time slot if an entry exists in StaffOccupancy table.
+	 * If no entry exists in StaffOccupancy table for a time slot then staff is considered available for that time slot
+	 * 
+	 * Query written in native mysql query because JPQL does not support this type of query generation.
+	 * This Query could be moved to criteria builder if JPA is required instead of native query.
+	 * 
+	 * @param date to check if staff is available on this date
+	 * @param startTime to check if staff is available on this time
+	 * @param endTime to check if staff is available on this time
+	 * @return List<StaffBookingView> list of staff which are available in this time slot
+	 */
 	@Query(value = "SELECT DISTINCT s.staff_id as staffId, s.first_name as firstName, s.last_name as lastName, s.vehicle_id as vehicleId"
 			+ " FROM Staff s"
 			+ " LEFT JOIN ("

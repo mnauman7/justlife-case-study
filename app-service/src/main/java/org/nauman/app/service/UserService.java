@@ -18,11 +18,15 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserService {
 
-	@Autowired
 	private UserRepository userRepository;
 
-	@Autowired
 	private ModelMapper modelMapper;
+	
+	@Autowired
+	public UserService(UserRepository userRepository, ModelMapper modelMapper) {
+		this.userRepository = userRepository;
+		this.modelMapper = modelMapper;
+	}
 	
 	private final Logger logs = LoggerFactory.getLogger(UserService.class);
 

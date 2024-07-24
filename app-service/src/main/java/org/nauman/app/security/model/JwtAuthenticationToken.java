@@ -5,6 +5,10 @@ import java.util.Collection;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
+/**
+ * Authentication object which is used by JwtAuthenticationFilter to let AuthenticationFilter know if
+ * Jwt validation was successfull or not
+ */
 public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken {
 
 	public JwtAuthenticationToken(Object principal, Object credentials, 

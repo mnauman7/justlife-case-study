@@ -18,6 +18,10 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ * This filter was created to validate JWT tokens for each request.
+ * This filter is added to spring security filter chain.
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

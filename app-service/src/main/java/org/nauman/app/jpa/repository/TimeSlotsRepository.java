@@ -13,6 +13,13 @@ public interface TimeSlotsRepository extends JpaRepository<TimeSlotEntity, Integ
 
 	public List<TimeSlotEntity> findAll();
 
+	/**
+	 * Methos used to bring all time slots entries in the time range
+	 * 
+	 * @param startTimeGreaterThan
+	 * @param endTimeLessThan
+	 * @return List<TimeSlotIdView> list of time slots
+	 */
 	public List<TimeSlotIdView> findSlotIdsByStartTimeGreaterThanEqualAndStartTimeLessThanEqual(
 			LocalTime startTimeGreaterThan, LocalTime endTimeLessThan);
 	

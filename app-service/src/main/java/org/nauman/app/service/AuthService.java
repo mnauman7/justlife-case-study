@@ -14,9 +14,19 @@ import org.springframework.web.server.ResponseStatusException;
 @Service
 public class AuthService {
 	
-	@Autowired
 	private UserRepository userRepository;
 	
+	@Autowired
+	public AuthService(UserRepository userRepository) {
+		this.userRepository = userRepository;
+	}
+	
+	
+	/**
+	 * Logins user and generates JWT token and sends it back in response in case of successful login.
+	 * @param loginDTO
+	 * @return LoginResponseDTO
+	 */
 	public LoginResponseDTO login(LoginDTO loginDTO) {
 		UserLoginView userLogin = userRepository.findByEmail(loginDTO.getEmail());
 		

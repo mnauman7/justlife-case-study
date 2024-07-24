@@ -1,11 +1,9 @@
 package org.nauman.app.controller;
 
-import java.time.LocalTime;
 import java.util.List;
 
 import org.nauman.app.model.AvailableSlotsDTO;
 import org.nauman.app.model.CreateAppointmentRequestDTO;
-import org.nauman.app.model.UserDTO;
 import org.nauman.app.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,6 +16,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+/**
+ * Appointment controller class
+ */
 @RestController
 @RequestMapping("/appointment")
 public class AppointmentController {
@@ -29,6 +30,13 @@ public class AppointmentController {
 		this.appointmentService = appointmentService;
 	}
 	
+	/**
+	 * @param date defines which date to search available slots
+	 * @param serviceHours defines what should be the duration be of each available slot
+	 * @param numberOfProfessionals defines how many staff member should be available in each slot
+	 * @param selectedStartTime which time to search available slots
+	 * @return List<AvailableSlotsDTO>  list of available slots found with given filters
+	 */
 	@GetMapping("/available-slots")
 	public List<AvailableSlotsDTO>  getAvailableSlots(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") String date,
 			@RequestParam(name = "service-hours", required = false) Integer serviceHours,
@@ -38,6 +46,11 @@ public class AppointmentController {
 		return appointmentService.getAvailableSlots(date, serviceHours, numberOfProfessionals, selectedStartTime);
 	}
 	
+	
+	
+    /**
+     * @param appointmentRequestDTO contains parameters which are used to generate new appointment
+     */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public void createAppointment(@RequestBody CreateAppointmentRequestDTO appointmentRequestDTO) {

@@ -32,6 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 
+/**
+ * This class is used to book new appointments and to check available slots for appointments.
+ */
 @Service
 public class AppointmentService {
 	
@@ -66,6 +69,13 @@ public class AppointmentService {
 		this.modelMapper = modelMapper;
 	}
 	
+	/**
+	 * @param date defines which date to search available slots
+	 * @param serviceHours defines what should be the duration be of each available slot
+	 * @param numberOfProfessionals defines how many staff member should be available in each slot
+	 * @param selectedStartTime which time to search available slots
+	 * @return List<AvailableSlotsDTO>  list of available slots found with given filters
+	 */
 	public List<AvailableSlotsDTO> getAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals,
 			String selectedStartTime) {
 		
@@ -78,6 +88,16 @@ public class AppointmentService {
 		
 	}
 	
+	/**
+	 * 
+	 * Searches for time slot in selectedStartTime time only
+	 * 
+	 * @param date defines which date to search available slots
+	 * @param serviceHours defines what should be the duration be of each available slot
+	 * @param numberOfProfessionals defines how many staff member should be available in each slot
+	 * @param selectedStartTime which time to search available slots
+	 * @return List<AvailableSlotsDTO>  list of available slots found with given filters
+	 */
 	public List<AvailableSlotsDTO> getAvailableSlotsWithStartTime(String date, Integer serviceHours,
 			Integer numberOfProfessionals, String selectedStartTime) {
 
@@ -122,6 +142,14 @@ public class AppointmentService {
 	}
 	
 	
+	/**
+	 * Searches all time slots and returns available staff in each time slot
+	 * 
+	 * @param date defines which date to search available slots
+	 * @param serviceHours defines what should be the duration be of each available slot
+	 * @param numberOfProfessionals defines how many staff member should be available in each slot
+	 * @return List<AvailableSlotsDTO>  list of available slots found with given filters
+	 */
 	public List<AvailableSlotsDTO> getAllAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals) {
 		
 		List<AvailableSlotsDTO> availableSlots = new ArrayList<>();
@@ -167,6 +195,13 @@ public class AppointmentService {
 	}
 	
 	
+	/**
+	 * @param date
+	 * @param timeSlot
+	 * @param serviceHours
+	 * @param numberOfProfessionals
+	 * @return List<StaffBookingDTO> staff which are available for this time slot
+	 */
 	private List<StaffBookingDTO> getAvailableStaffForThisSlot(String date, TimeSlotEntity timeSlot,
 			Integer serviceHours, Integer numberOfProfessionals) {
 		
@@ -196,6 +231,15 @@ public class AppointmentService {
 		return staffBookingDTOList;
 	}
 	
+	/**
+	 * This method creates new appointments
+	 * There are three steps when creating new appointment:
+	 * 1). Create new entry in Appointment table
+	 * 2). Store relation for staff and appointment in AppointmentStaff table
+	 * 3). Update StaffOccupancy table to ensure that this staff is shown as unavailable in this time slot in booking section
+	 * 
+	 * @param appointmentRequestDTO contains parameters to book new appointment with
+	 */
 	@Transactional
     public void createAppointment(CreateAppointmentRequestDTO appointmentRequestDTO) {
 		
@@ -220,6 +264,16 @@ public class AppointmentService {
     }
 	
 	
+	/**
+	 * Updates staff occupancy.
+	 * It occupies staff by adding an entry in StaffOccupancy table.
+	 * If staff does not contain entry for a time slot in StaffOccupancy table then that staff 
+	 * is considered available for other bookings in this slot.
+	 * Updating staff occupancy ensures that staff is fully booked in this time slot
+	 * and will not be taking new appointments in this slot.
+	 * 
+	 * @param appointmentRequestDTO
+	 */
 	private void updateStaffOccupancy(CreateAppointmentRequestDTO appointmentRequestDTO) {
 		
 		List<StaffOccupancyEntity> staffOccupancyEntityList = new ArrayList<>();
@@ -285,6 +339,11 @@ public class AppointmentService {
 	    return staffList.stream().anyMatch(p -> p.getStaffId().equals(staffId));
 	}
 
+	/**
+	 * Prepares AppointmentEntity which needs to be saved in database for appointment creation process.
+	 * @param appointmentRequestDTO
+	 * @return AppointmentEntity
+	 */
 	private AppointmentEntity prepareAppointmentEntityFromRequest(CreateAppointmentRequestDTO appointmentRequestDTO) {
 		AppointmentEntity appointmentEntity = new AppointmentEntity();
 		appointmentEntity.setUserId(appointmentRequestDTO.getUserId());
@@ -301,6 +360,12 @@ public class AppointmentService {
 	}
 	
 	
+	/**
+	 * Prepares AppointmentStaffEntity which needs to be saved in database for appointment creation process.
+	 * @param appointmentRequestDTO
+	 * @param appointmentEntity
+	 * @return List<AppointmentStaffEntity> 
+	 */
 	private List<AppointmentStaffEntity> prepareAppointmentStaffRelationEntities(
 			CreateAppointmentRequestDTO appointmentRequestDTO, AppointmentEntity appointmentEntity) {
 

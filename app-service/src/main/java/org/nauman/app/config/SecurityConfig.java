@@ -21,6 +21,9 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+/**
+ * Purpose of this class is to setup spring security filter chain and to define spring security configurations.
+ */
 @Configuration
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
@@ -30,10 +33,12 @@ public class SecurityConfig {
 	public static final List<String> SPRING_SECURITY_ALLOWED_URLS_LIST =
 		      Collections.unmodifiableList(Arrays.asList(SPRING_SECURITY_ALLOWED_URLS));
 	
-	/*
-	 * Creating our own filter chain so spring security uses this filter chain instead of creating its default one
-	 * 
-	 * */
+    /**
+     * @param http
+     * @param jwtAuthenticationFilter
+     * @return Creating our own filter chain so spring security uses this filter chain instead of creating its default one
+     * @throws Exception
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         return http
@@ -46,20 +51,20 @@ public class SecurityConfig {
         		.build();
     }
     
-	/*
-	 * Creating authManager with list of providers
-	 * This authManager bean is being used in JwtAuthenticationfilter
-	 * 
-	 * */
+
+    /**
+     * @param tokenAuthProvider this authProvider is used by auth manager to validate jwt tokens
+     * @return creating auth manager which is used by our JWT filter
+     */
     @Bean
     public AuthenticationManager authManager(JwtAuthenticationProvider tokenAuthProvider) {
         return new ProviderManager(List.of(tokenAuthProvider));
     }
 
-	/*
-	 * Creating corsFilter bean with our settings so spring security uses this bean instead of its default one
-	 * 
-	 * */
+
+    /**
+     * @return Creating corsFilter bean with our settings so spring security uses this bean instead of its default one
+     */
     @Bean
     public CorsFilter corsFilter() {
       UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

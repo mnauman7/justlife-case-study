@@ -9,12 +9,16 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 import jakarta.servlet.http.HttpServletRequest;
 
+
+/**
+ *  Utility class to genrate and validate JWT token.
+ *  
+ *  Note: issuer and secret is hardcoded for now but should be set in vault server in prod environment.
+ */
 public class JwtUtils {
 
-	// @Value("${jwt.token-validity-days}")
 	private static Integer tokenValidMinutes = 100;
 
-	// @Value("${jwt.issuer}")
 	private static String issuer = "Nauman";
 	
 	private static String secret = "tytyNopopHHjjkkk";
