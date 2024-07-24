@@ -66,8 +66,63 @@ public class AppointmentService {
 		this.modelMapper = modelMapper;
 	}
 	
+	public List<AvailableSlotsDTO> getAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals,
+			String selectedStartTime) {
+		
+		if (selectedStartTime != null && !selectedStartTime.isBlank()) {
+			return getAvailableSlotsWithStartTime(date, serviceHours, numberOfProfessionals,
+					selectedStartTime);
+		} else {
+			return getAllAvailableSlots( date, serviceHours, numberOfProfessionals);
+		}
+		
+	}
 	
-	public List<AvailableSlotsDTO> getAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals) {
+	public List<AvailableSlotsDTO> getAvailableSlotsWithStartTime(String date, Integer serviceHours,
+			Integer numberOfProfessionals, String selectedStartTime) {
+
+		List<AvailableSlotsDTO> availableSlots = new ArrayList<>();
+
+		try {
+
+			LocalDate localDate = LocalDate.parse(date);
+			if (localDate.getDayOfWeek() == DayOfWeek.FRIDAY) {
+				// no appointments on friday
+				return new ArrayList<>();
+			}
+
+			LocalTime startTime = LocalTime.parse(selectedStartTime);
+
+			TimeSlotEntity timeSlot = timeSlotsRepository.findByStartTime(startTime);
+
+			if (timeSlot.getEndTime().plusHours(serviceHours).isAfter(CLOSING_TIME)) {
+				// skip if time slot exceed closing time
+				return availableSlots;
+			}
+
+			AvailableSlotsDTO availableSlotDTO = new AvailableSlotsDTO();
+			availableSlotDTO.setDate(date);
+			availableSlotDTO.setStartingTime(timeSlot.getSlotName());
+			availableSlotDTO.setStartingTimeId(timeSlot.getSlotId());
+			availableSlotDTO.setDuration(serviceHours);
+
+			availableSlotDTO.setAvailableStaff(
+					getAvailableStaffForThisSlot(date, timeSlot, serviceHours, numberOfProfessionals));
+
+			if (availableSlotDTO.getAvailableStaff() != null && !availableSlotDTO.getAvailableStaff().isEmpty()) {
+
+				availableSlots.add(availableSlotDTO);
+			}
+
+		} catch (Exception e) {
+			logs.error("getAvailableSlots failed", e);
+		}
+
+		return availableSlots;
+	}
+	
+	
+	public List<AvailableSlotsDTO> getAllAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals) {
 		
 		List<AvailableSlotsDTO> availableSlots = new ArrayList<>();
 		

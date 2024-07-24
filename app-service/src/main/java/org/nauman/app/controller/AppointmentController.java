@@ -1,5 +1,6 @@
 package org.nauman.app.controller;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import org.nauman.app.model.AvailableSlotsDTO;
@@ -31,9 +32,10 @@ public class AppointmentController {
 	@GetMapping("/available-slots")
 	public List<AvailableSlotsDTO>  getAvailableSlots(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") String date,
 			@RequestParam(name = "service-hours", required = false) Integer serviceHours,
-			@RequestParam(name = "professionals", required = false) Integer numberOfProfessionals) {
+			@RequestParam(name = "professionals", required = false) Integer numberOfProfessionals,
+			@RequestParam(name = "start-time", required = false) String selectedStartTime) {
 		
-		return appointmentService.getAvailableSlots(date, serviceHours, numberOfProfessionals);
+		return appointmentService.getAvailableSlots(date, serviceHours, numberOfProfessionals, selectedStartTime);
 	}
 	
     @PostMapping

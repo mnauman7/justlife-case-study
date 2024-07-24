@@ -17,5 +17,7 @@ public interface TimeSlotsRepository extends JpaRepository<TimeSlotEntity, Integ
 			LocalTime startTimeGreaterThan, LocalTime endTimeLessThan);
 	
 	public TimeSlotIdView findSlotIdByStartTime(LocalTime starTime);
+	
+	public TimeSlotEntity findByStartTime(LocalTime starTime);
 
 }
