@@ -58,7 +58,7 @@ public class AppointmentEntity {
     private UserEntity user;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "starting_time_id", insertable = false, updatable = false)
+    @JoinColumn(name = "start_time_slot_id", insertable = false, updatable = false)
     private TimeSlotEntity timeSlots;
     
     @ManyToOne(fetch = FetchType.LAZY)

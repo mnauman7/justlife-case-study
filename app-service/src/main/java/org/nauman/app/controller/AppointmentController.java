@@ -4,17 +4,21 @@ import java.util.List;
 
 import org.nauman.app.model.AvailableSlotsDTO;
 import org.nauman.app.model.CreateAppointmentRequestDTO;
+import org.nauman.app.model.UserAppointmentDTO;
 import org.nauman.app.service.AppointmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+
+import jakarta.websocket.server.PathParam;
 
 /**
  * Appointment controller class
@@ -56,5 +60,15 @@ public class AppointmentController {
     public void createAppointment(@RequestBody CreateAppointmentRequestDTO appointmentRequestDTO) {
     	appointmentService.createAppointment(appointmentRequestDTO);
     }
+    
+    
+	/**
+	 * @param userId
+	 * @return list of appointments booked by this user
+	 */
+	@GetMapping("/{userId}")
+	public List<UserAppointmentDTO> getUserAppointments(@PathVariable("userId") Integer userId) {
+		return appointmentService.getUserAppointments(userId);
+	}
 
 }

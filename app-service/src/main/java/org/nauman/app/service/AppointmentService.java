@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.nauman.app.enums.StaffOccupancyType;
 import org.nauman.app.jpa.entity.AppointmentEntity;
 import org.nauman.app.jpa.entity.AppointmentStaffEntity;
@@ -26,6 +27,8 @@ import org.nauman.app.model.AvailableSlotsDTO;
 import org.nauman.app.model.CreateAppointmentRequestDTO;
 import org.nauman.app.model.StaffBookingDTO;
 import org.nauman.app.model.StaffDTO;
+import org.nauman.app.model.UserAppointmentDTO;
+import org.nauman.app.model.UserViewDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +82,12 @@ public class AppointmentService {
 	public List<AvailableSlotsDTO> getAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals,
 			String selectedStartTime) {
 		
+		LocalDate selectedDate = LocalDate.parse(date);
+		if (selectedDate.getDayOfWeek() == DayOfWeek.FRIDAY || selectedDate.isBefore(LocalDate.now())) {
+			// no appointments available on friday or past dates
+			return new ArrayList<>();
+		}
+		
 		if (selectedStartTime != null && !selectedStartTime.isBlank()) {
 			return getAvailableSlotsWithStartTime(date, serviceHours, numberOfProfessionals,
 					selectedStartTime);
@@ -104,12 +113,6 @@ public class AppointmentService {
 		List<AvailableSlotsDTO> availableSlots = new ArrayList<>();
 
 		try {
-
-			LocalDate localDate = LocalDate.parse(date);
-			if (localDate.getDayOfWeek() == DayOfWeek.FRIDAY) {
-				// no appointments on friday
-				return new ArrayList<>();
-			}
 
 			LocalTime startTime = LocalTime.parse(selectedStartTime);
 
@@ -155,12 +158,6 @@ public class AppointmentService {
 		List<AvailableSlotsDTO> availableSlots = new ArrayList<>();
 		
 		try {
-			
-			LocalDate localDate = LocalDate.parse(date);
-			if(localDate.getDayOfWeek() == DayOfWeek.FRIDAY) {
-				// no appointments on friday
-				return new ArrayList<>();
-			}
 			
 			List<TimeSlotEntity> timeSlots = timeSlotsRepository.findAll();
 			
@@ -256,7 +253,7 @@ public class AppointmentService {
 			appointmentStaffRepository.saveAll(appointmentStaffEntities);
 			
 			//update staff occupancy
-			updateStaffOccupancy(appointmentRequestDTO);
+			updateStaffOccupancy(appointmentRequestDTO, appointmentEntity.getAppointmentId());
 			
 		}catch(Exception e) {
 			logs.error("createAppointment failed", e);
@@ -274,7 +271,7 @@ public class AppointmentService {
 	 * 
 	 * @param appointmentRequestDTO
 	 */
-	private void updateStaffOccupancy(CreateAppointmentRequestDTO appointmentRequestDTO) {
+	private void updateStaffOccupancy(CreateAppointmentRequestDTO appointmentRequestDTO, Integer appointmentId) {
 		
 		List<StaffOccupancyEntity> staffOccupancyEntityList = new ArrayList<>();
 		
@@ -296,8 +293,13 @@ public class AppointmentService {
 				staffOccupancyEntity.setTimeSlotId(timeSlot.getSlotId());
 				staffOccupancyEntity.setOccupancyDate(appointmentRequestDTO.getAppointmentDate());
 				staffOccupancyEntity.setOccupancyTypeId(StaffOccupancyType.WORK.getValue());
+				staffOccupancyEntity.setAppointmentId(appointmentId);
 				
 				staffOccupancyEntityList.add(staffOccupancyEntity);
+			}
+			
+			if(breakTimeSlot == null) {
+				continue;
 			}
 			
 			// occupying slot for break
@@ -306,6 +308,7 @@ public class AppointmentService {
 			staffOccupancyEntity.setTimeSlotId(breakTimeSlot.getSlotId());
 			staffOccupancyEntity.setOccupancyDate(appointmentRequestDTO.getAppointmentDate());
 			staffOccupancyEntity.setOccupancyTypeId(StaffOccupancyType.BREAK.getValue());
+			staffOccupancyEntity.setAppointmentId(appointmentId);
 			
 			staffOccupancyEntityList.add(staffOccupancyEntity);
 		}
@@ -324,9 +327,9 @@ public class AppointmentService {
 				staffOccupancyEntity.setTimeSlotId(startingTimeSlot.getSlotId());
 				staffOccupancyEntity.setOccupancyDate(appointmentRequestDTO.getAppointmentDate());
 				staffOccupancyEntity.setOccupancyTypeId(StaffOccupancyType.VEHICLE_BUSY.getValue());
+				staffOccupancyEntity.setAppointmentId(appointmentId);
 				
-				staffOccupancyEntityList.add(staffOccupancyEntity);
-				
+				staffOccupancyEntityList.add(staffOccupancyEntity);	
 			}
 		}
 		
@@ -380,6 +383,57 @@ public class AppointmentService {
 		}
 
 		return appointmentStaffEntities;
+	}
+	
+	
+	/**
+	 * @param userId
+	 * @return list of all appointments booked by this user
+	 */
+	public List<UserAppointmentDTO> getUserAppointments(Integer userId) {
+		
+		List<UserAppointmentDTO> userAppointments = new ArrayList<>();
+		
+		try {
+			
+			List<AppointmentEntity> userAppointmentsEntities = appointmentRepository.findByUserId(userId);
+			
+			userAppointments = getUserAppointmentDTOFromEntity(userAppointmentsEntities);
+			
+			return userAppointments;
+			
+		}catch(Exception e) {
+			logs.error("getUserAppointments failed", e);
+		}
+		
+		
+		return userAppointments;
+		
+	}
+	
+	private List<UserAppointmentDTO> getUserAppointmentDTOFromEntity(List<AppointmentEntity> userAppointmentsEntities){
+		
+		List<UserAppointmentDTO> userAppointmentsDTO = new ArrayList<>();
+		
+		for(AppointmentEntity appointmentEntity : userAppointmentsEntities) {
+			
+			UserAppointmentDTO userAppointment = new UserAppointmentDTO();
+			userAppointment.setAppointmentId(appointmentEntity.getAppointmentId());
+			userAppointment.setAddress(appointmentEntity.getAddress());
+			userAppointment.setAppointmentDate(appointmentEntity.getAppointmentDate());
+			userAppointment.setCity(appointmentEntity.getCity());
+			userAppointment.setCreatedDate(appointmentEntity.getCreatedDate());
+			userAppointment.setDuration(appointmentEntity.getDuration());
+			userAppointment.setServiceType(appointmentEntity.getServiceType());
+			userAppointment.setStartTimeSlotId(appointmentEntity.getStartTimeSlotId());
+			userAppointment.setUpdatedDate(appointmentEntity.getUpdatedDate());
+			userAppointment.setUserId(appointmentEntity.getUserId());
+			userAppointment.setVehicleId(appointmentEntity.getVehicleId());
+			
+			userAppointmentsDTO.add(userAppointment);
+		}
+		
+		return userAppointmentsDTO;
 	}
 	
 }

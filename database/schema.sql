@@ -88,9 +88,11 @@ CREATE TABLE IF NOT EXISTS StaffOccupancy (
   occupancy_id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   staff_id INT(4) UNSIGNED NOT NULL,
   time_slot_id TINYINT UNSIGNED NOT NULL,
+  appointment_id BIGINT UNSIGNED NULL,
   occupancy_date DATE NOT NULL,
   occupancy_type_id TINYINT UNSIGNED NOT NULL,
   FOREIGN KEY (staff_id) REFERENCES Staff(staff_id),
   FOREIGN KEY (time_slot_id) REFERENCES TimeSlots(slot_id),
-  FOREIGN KEY (occupancy_type_id) REFERENCES StaffOccupancyTypeMaster(occupancy_type_id)
+  FOREIGN KEY (occupancy_type_id) REFERENCES StaffOccupancyTypeMaster(occupancy_type_id),
+  FOREIGN KEY (appointment_id) REFERENCES Appointments(appointment_id)
 ) engine=InnoDB;

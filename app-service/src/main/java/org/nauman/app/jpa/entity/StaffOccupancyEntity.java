@@ -35,6 +35,9 @@ public class StaffOccupancyEntity {
     @Column(name = "occupancy_type_id", nullable = false)
     private Integer occupancyTypeId;
     
+    @Column(name = "appointment_id")
+    private Integer appointmentId;
+    
 
 	public Integer getOccupancyId() {
 		return occupancyId;
@@ -74,6 +77,14 @@ public class StaffOccupancyEntity {
 
 	public void setOccupancyTypeId(Integer occupancyTypeId) {
 		this.occupancyTypeId = occupancyTypeId;
+	}
+
+	public Integer getAppointmentId() {
+		return appointmentId;
+	}
+
+	public void setAppointmentId(Integer appointmentId) {
+		this.appointmentId = appointmentId;
 	}
     
 	
