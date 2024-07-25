@@ -13,6 +13,7 @@ import { AuthenticationGuard } from './auth/auth-guard';
 import { HeaderComponent } from './app-header/app-header.component';
 import { JwtInterceptor } from './auth/jwt-intercepter';
 import { BookingModule } from './booking/booking.module';
+import { AppointmentsModule } from './appointments/appointment.module';
 
 
 @NgModule({
@@ -26,6 +27,7 @@ import { BookingModule } from './booking/booking.module';
     HttpClientModule,
     UsersModule,
     BookingModule,
+    AppointmentsModule,
     AuthModule,
     PartsModule,
     BrowserAnimationsModule,

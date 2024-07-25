@@ -48,7 +48,7 @@ public class AppointmentServiceTest {
 	@Test
 	public void test_getAllAvailableSlots_withInvalidDates() {
 		// passing friday 
-		List<AvailableSlotsDTO> availableSlotsOnFriday = appointmentService.getAllAvailableSlots("2024-07-26",2,2);
+		List<AvailableSlotsDTO> availableSlotsOnFriday = appointmentService.getAvailableSlots("2024-07-26",2,2,null);
 
 		assertNotNull(availableSlotsOnFriday);
 
@@ -56,7 +56,7 @@ public class AppointmentServiceTest {
 		assertEquals(availableSlotsOnFriday.isEmpty(), true);
 		
 		// passing old date 
-		List<AvailableSlotsDTO> availableSlotsInPast = appointmentService.getAllAvailableSlots("2003-07-26",2,2);
+		List<AvailableSlotsDTO> availableSlotsInPast = appointmentService.getAvailableSlots("2003-07-26",2,2,null);
 
 		assertNotNull(availableSlotsInPast);
 
@@ -67,7 +67,7 @@ public class AppointmentServiceTest {
 	@Test
 	public void test_getAvailableSlotsWithStartTime_withInvalidDates() {
 		// passing friday 
-		List<AvailableSlotsDTO> availableSlotsOnFriday = appointmentService.getAvailableSlotsWithStartTime("2024-07-26",2,2,"08:00");
+		List<AvailableSlotsDTO> availableSlotsOnFriday = appointmentService.getAvailableSlots("2024-07-26",2,2,"08:00");
 
 		assertNotNull(availableSlotsOnFriday);
 
@@ -75,7 +75,7 @@ public class AppointmentServiceTest {
 		assertEquals(availableSlotsOnFriday.isEmpty(), true);
 		
 		// passing old date 
-		List<AvailableSlotsDTO> availableSlotsInPast = appointmentService.getAvailableSlotsWithStartTime("2003-07-26",2,2,"08:00");
+		List<AvailableSlotsDTO> availableSlotsInPast = appointmentService.getAvailableSlots("2003-07-26",2,2,"08:00");
 
 		assertNotNull(availableSlotsInPast);
 
@@ -90,8 +90,7 @@ public class AppointmentServiceTest {
 		// mocking timeslot repository
 		when(timeSlotsRepository.findByStartTime(LocalTime.parse("20:00"))).thenReturn(timeSlot);
 		
-		// passing friday 
-		List<AvailableSlotsDTO> availableSlotsAfterClosingTime = appointmentService.getAvailableSlotsWithStartTime("2024-07-26",2,4,"20:00");
+		List<AvailableSlotsDTO> availableSlotsAfterClosingTime = appointmentService.getAvailableSlots("2024-07-28",2,4,"20:00");
 
 		assertNotNull(availableSlotsAfterClosingTime);
 

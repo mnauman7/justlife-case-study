@@ -26,6 +26,7 @@ export class LoginComponent implements OnInit {
     this.authService.loginUser(loginCreds).subscribe(
       response => {
         this.cookieService.set('token', response.token);
+        this.cookieService.set('userId', response.userId);
         this.authService.isAuthenticated = true;
         this.goToHomePage();
       },

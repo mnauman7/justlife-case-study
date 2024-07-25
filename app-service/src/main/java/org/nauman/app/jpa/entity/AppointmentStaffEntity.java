@@ -2,9 +2,12 @@ package org.nauman.app.jpa.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,7 +24,7 @@ public class AppointmentStaffEntity {
     
     @Column(name = "staff_id", nullable = false)
 	private Integer staffId;
-
+    
     
 	public Integer getId() {
 		return id;
@@ -46,7 +49,5 @@ public class AppointmentStaffEntity {
 	public void setStaffId(Integer staffId) {
 		this.staffId = staffId;
 	}
-    
-    
     
 }

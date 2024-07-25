@@ -52,6 +52,8 @@
           <th>Start Time</th>
           <th>Duration</th>
           <th>Staff</th>
+          <th *ngIf="numberOfProfessionals >= 2">Staff # 2</th>
+          <th *ngIf="numberOfProfessionals >= 3">Staff # 3</th>
           <th>Book</th>
         </tr>
         </thead>
@@ -63,8 +65,22 @@
           <td>{{ slot.startingTime }}</td>
           <td>{{ slot.duration }}</td>
           <td>          
-            <select>
-              <option *ngFor="let staff of slot.availableStaff">
+            <select id="staff1" name="staff1"  [(ngModel)]="slot.staff1">
+              <option *ngFor="let staff of slot.availableStaff" [ngValue]="staff">
+                {{staff.fullName}}
+              </option>
+            </select>
+          </td>
+          <td *ngIf="numberOfProfessionals >= 2">          
+            <select id="staff2" name="staff2"  [(ngModel)]="slot.staff2">
+              <option *ngFor="let staff of slot.availableStaff" [ngValue]="staff">
+                {{staff.fullName}}
+              </option>
+            </select>
+          </td>
+          <td *ngIf="numberOfProfessionals >= 3">          
+            <select id="staff3" name="staff3"  [(ngModel)]="slot.staff3">
+              <option *ngFor="let staff of slot.availableStaff" [ngValue]="staff">
                 {{staff.fullName}}
               </option>
             </select>

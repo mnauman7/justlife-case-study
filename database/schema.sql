@@ -67,7 +67,8 @@ CREATE TABLE IF NOT EXISTS Appointments (
   FOREIGN KEY (user_id) REFERENCES Users(user_id),
   FOREIGN KEY (start_time_slot_id) REFERENCES TimeSlots(slot_id),
   FOREIGN KEY (service_type) REFERENCES JobTypeMaster(job_type_id),
-  FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id)
+  FOREIGN KEY (vehicle_id) REFERENCES Vehicles(vehicle_id),
+  UNIQUE KEY unique_slots (appointment_date , start_time_slot_id)
 ) engine=InnoDB;
 
 CREATE TABLE IF NOT EXISTS AppointmentStaff (

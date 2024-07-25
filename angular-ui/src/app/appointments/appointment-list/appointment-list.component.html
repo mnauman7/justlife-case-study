@@ -1,0 +1,39 @@
+<div class="container-fluid">
+  <div class="container xd-container">
+    <h2>Your Appointments</h2>
+
+    <form method="get"
+          class="form-horizontal" id="search-appointment-form">
+      
+    </form>
+
+    <div *ngIf="!appointments">No appointments booked yet.</div>
+    &nbsp;
+    <div class="table-responsive" id="appointmentsTable"  *ngIf="appointments">
+      <table class="table table-striped">
+        <thead>
+        <tr>
+          <th>Appointment ID</th>
+          <th>Appointment Date</th>
+          <th>Start Time</th>
+          <th>Duration</th>
+          <th>Update</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <tr *ngFor="let appointment of appointments">
+          <td>{{ appointment.appointmentId }}</td>
+          <td>{{ appointment.appointmentDate }}</td>
+          <td>{{ appointment.startTime }}</td>
+          <td>{{ appointment.duration }}</td>
+          <td class="updatehis"><a (click)="onUpdate(appointment)">Update This Appointment</a></td>
+          <td>
+        </td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+  </div>
+</div>

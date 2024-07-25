@@ -2,7 +2,7 @@ package org.nauman.app.jpa.entity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +11,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -68,6 +70,13 @@ public class AppointmentEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", insertable = false, updatable = false)
     private VehicleEntity vehicle;
+    
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+    		  name = "AppointmentStaff",
+    		  joinColumns = @JoinColumn(name = "appointment_id"), 
+    		  inverseJoinColumns = @JoinColumn(name = "staff_id"))
+    private List<StaffEntity> staff;
 
     
 	public Integer getAppointmentId() {
@@ -189,7 +198,13 @@ public class AppointmentEntity {
 	public void setUpdatedDate(LocalDateTime updatedDate) {
 		this.updatedDate = updatedDate;
 	}
-	
-	
+
+	public List<StaffEntity> getStaff() {
+		return staff;
+	}
+
+	public void setStaff(List<StaffEntity> staff) {
+		this.staff = staff;
+	}
     
 }

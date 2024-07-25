@@ -2,17 +2,15 @@ package org.nauman.app.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.util.List;
 
-public class UserAppointmentDTO {
-	
+public class AppointmentDTO {
+
 	private Integer appointmentId;
-	
+    
     private Integer userId;
     
     private Integer startTimeSlotId;
-    
-	private String startTime;
     
     private Integer duration;
     
@@ -21,14 +19,16 @@ public class UserAppointmentDTO {
     private Integer serviceType;
     
     private Integer vehicleId;
-
+    
     private String address;
     
     private String city;
-
+    
     private LocalDateTime createdDate;
     
     private LocalDateTime updatedDate;
+    
+    private List<StaffDTO> staff;
 
     
 	public Integer getAppointmentId() {
@@ -46,21 +46,13 @@ public class UserAppointmentDTO {
 	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
-	
+
 	public Integer getStartTimeSlotId() {
 		return startTimeSlotId;
 	}
 
 	public void setStartTimeSlotId(Integer startTimeSlotId) {
 		this.startTimeSlotId = startTimeSlotId;
-	}
-
-	public String getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(String startTime) {
-		this.startTime = startTime;
 	}
 
 	public Integer getDuration() {
@@ -125,6 +117,14 @@ public class UserAppointmentDTO {
 
 	public void setUpdatedDate(LocalDateTime updatedDate) {
 		this.updatedDate = updatedDate;
+	}
+
+	public List<StaffDTO> getStaff() {
+		return staff;
+	}
+
+	public void setStaff(List<StaffDTO> staff) {
+		this.staff = staff;
 	}
     
 }

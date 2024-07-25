@@ -6,13 +6,14 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeToken;
 import org.nauman.app.enums.StaffOccupancyType;
 import org.nauman.app.jpa.entity.AppointmentEntity;
 import org.nauman.app.jpa.entity.AppointmentStaffEntity;
+import org.nauman.app.jpa.entity.StaffEntity;
 import org.nauman.app.jpa.entity.StaffOccupancyEntity;
 import org.nauman.app.jpa.entity.TimeSlotEntity;
 import org.nauman.app.jpa.projections.StaffBookingView;
@@ -23,12 +24,13 @@ import org.nauman.app.jpa.repository.AppointmentStaffRepository;
 import org.nauman.app.jpa.repository.StaffOccupancyRepository;
 import org.nauman.app.jpa.repository.StaffRepository;
 import org.nauman.app.jpa.repository.TimeSlotsRepository;
+import org.nauman.app.model.AppointmentDTO;
 import org.nauman.app.model.AvailableSlotsDTO;
 import org.nauman.app.model.CreateAppointmentRequestDTO;
 import org.nauman.app.model.StaffBookingDTO;
 import org.nauman.app.model.StaffDTO;
+import org.nauman.app.model.UpdateAppointmentRequestDTO;
 import org.nauman.app.model.UserAppointmentDTO;
-import org.nauman.app.model.UserViewDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,9 +94,57 @@ public class AppointmentService {
 			return getAvailableSlotsWithStartTime(date, serviceHours, numberOfProfessionals,
 					selectedStartTime);
 		} else {
-			return getAllAvailableSlots( date, serviceHours, numberOfProfessionals);
+			return getAllAvailableSlots(date, serviceHours, numberOfProfessionals);
+		}
+	}
+	
+	/**
+	 * @param date defines which date to search available slots
+	 * @param appointmentId
+	 * @return List<AvailableSlotsDTO>  list of available slots found with given filters
+	 */
+	public List<AvailableSlotsDTO> getAvailableSlotsForExistingAppointment(String date, Integer appointmentId) {
+		
+		List<AvailableSlotsDTO> availableSlotsForAppointment = new ArrayList<>();
+		
+		try {
+			
+			LocalDate selectedDate = LocalDate.parse(date);
+			
+			if (selectedDate.getDayOfWeek() == DayOfWeek.FRIDAY || selectedDate.isBefore(LocalDate.now())) {
+				// no appointments available on friday or past dates
+				return new ArrayList<>();
+			}
+			
+			Optional<AppointmentEntity> optionalAppointment = 
+					appointmentRepository.findAppointmentWithStaffByAppointmentId(appointmentId);
+			
+			if(optionalAppointment.isEmpty()) {
+				return new ArrayList<>();
+			}
+			
+			AppointmentEntity appointmentEntity = optionalAppointment.get();
+			
+			AppointmentDTO appointmentDTO = getAppointmentDTOFromEntity(appointmentEntity);
+			
+			List<Integer> staffIds = getStaffIdsFromAppointmentDTO(appointmentDTO);
+			
+			List<TimeSlotEntity> availableSlots = timeSlotsRepository.findAvailableTimeSlotsForStaff(staffIds, selectedDate);
+			
+			for(TimeSlotEntity timeSlot : availableSlots ) {
+				AvailableSlotsDTO availableSlotDTO = new AvailableSlotsDTO();
+				availableSlotDTO.setDate(date);
+				availableSlotDTO.setStartingTime(timeSlot.getSlotName());
+				availableSlotDTO.setStartingTimeId(timeSlot.getSlotId());
+				
+				availableSlotsForAppointment.add(availableSlotDTO);
+			}
+			
+		}catch (Exception e) {
+			logs.error("getAvailableSlotsForExistingAppointment failed", e);
 		}
 		
+		return availableSlotsForAppointment;
 	}
 	
 	/**
@@ -107,7 +157,7 @@ public class AppointmentService {
 	 * @param selectedStartTime which time to search available slots
 	 * @return List<AvailableSlotsDTO>  list of available slots found with given filters
 	 */
-	public List<AvailableSlotsDTO> getAvailableSlotsWithStartTime(String date, Integer serviceHours,
+	private List<AvailableSlotsDTO> getAvailableSlotsWithStartTime(String date, Integer serviceHours,
 			Integer numberOfProfessionals, String selectedStartTime) {
 
 		List<AvailableSlotsDTO> availableSlots = new ArrayList<>();
@@ -153,7 +203,7 @@ public class AppointmentService {
 	 * @param numberOfProfessionals defines how many staff member should be available in each slot
 	 * @return List<AvailableSlotsDTO>  list of available slots found with given filters
 	 */
-	public List<AvailableSlotsDTO> getAllAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals) {
+	private List<AvailableSlotsDTO> getAllAvailableSlots(String date, Integer serviceHours, Integer numberOfProfessionals) {
 		
 		List<AvailableSlotsDTO> availableSlots = new ArrayList<>();
 		
@@ -246,14 +296,16 @@ public class AppointmentService {
 			AppointmentEntity appointmentEntity = prepareAppointmentEntityFromRequest(appointmentRequestDTO);
 			appointmentEntity = appointmentRepository.save(appointmentEntity);
 			
+			AppointmentDTO appointmentDTO = getAppointmentDTOFromEntity(appointmentEntity);
+			
 			//saving appointment staff relation
 			List<AppointmentStaffEntity> appointmentStaffEntities = 
-					prepareAppointmentStaffRelationEntities(appointmentRequestDTO, appointmentEntity);
+					prepareAppointmentStaffRelationEntities(appointmentDTO.getAppointmentId(), appointmentRequestDTO.getRequiredStaff());
  			
 			appointmentStaffRepository.saveAll(appointmentStaffEntities);
 			
-			//update staff occupancy
-			updateStaffOccupancy(appointmentRequestDTO, appointmentEntity.getAppointmentId());
+			//add staff occupancy
+			addStaffOccupancy(appointmentDTO, appointmentRequestDTO.getRequiredStaff());
 			
 		}catch(Exception e) {
 			logs.error("createAppointment failed", e);
@@ -262,38 +314,74 @@ public class AppointmentService {
 	
 	
 	/**
-	 * Updates staff occupancy.
+	 * This method updates existing appointments
+	 * 
+	 * @param appointmentRequestDTO contains parameters to update date and time of appointment
+	 */
+	@Transactional
+    public void updateAppointment(Integer appointmentId, UpdateAppointmentRequestDTO appointmentRequestDTO) {
+		
+		try {
+			Optional<AppointmentEntity> optionalAppointment = 
+					appointmentRepository.findAppointmentWithStaffByAppointmentId(appointmentId);
+			
+			if(optionalAppointment.isEmpty()) {
+				return;
+			}
+			
+			AppointmentEntity appointmentEntity = optionalAppointment.get();
+			
+			AppointmentDTO appointmentDTO = getAppointmentDTOFromEntity(appointmentEntity);
+			
+			//updating appointment entry
+			appointmentRepository.updateDateAndTimeOfAppointment(appointmentRequestDTO.getStartingTimeId(),
+					appointmentRequestDTO.getAppointmentDate(), appointmentId);
+			
+			// free up time for this appointment so booking is available for this time slot now
+			staffOccupancyRepository.deleteStaffOccupancyByAppointmentId(appointmentId);
+			
+			//add staff occupancy
+			addStaffOccupancy(appointmentDTO, appointmentDTO.getStaff());
+			
+		}catch(Exception e) {
+			logs.error("updateAppointment failed", e);
+		}
+    }
+	
+	
+	/**
+	 * Adds staff occupancy.
 	 * It occupies staff by adding an entry in StaffOccupancy table.
 	 * If staff does not contain entry for a time slot in StaffOccupancy table then that staff 
-	 * is considered available for other bookings in this slot.
+	 * is considered available for bookings in the slot.
 	 * Updating staff occupancy ensures that staff is fully booked in this time slot
 	 * and will not be taking new appointments in this slot.
 	 * 
 	 * @param appointmentRequestDTO
 	 */
-	private void updateStaffOccupancy(CreateAppointmentRequestDTO appointmentRequestDTO, Integer appointmentId) {
+	private void addStaffOccupancy(AppointmentDTO appointmentDTO, List<StaffDTO> requiredStaffList) {
 		
 		List<StaffOccupancyEntity> staffOccupancyEntityList = new ArrayList<>();
 		
-		TimeSlotEntity startingTimeSlot = timeSlotsRepository.findById(appointmentRequestDTO.getStartingTimeId()).get();
+		TimeSlotEntity startingTimeSlot = timeSlotsRepository.findById(appointmentDTO.getStartTimeSlotId()).get();
 		 
 		LocalTime startTime = startingTimeSlot.getStartTime();
-		LocalTime endTime = startTime.plusHours(appointmentRequestDTO.getDuration());
+		LocalTime endTime = startTime.plusHours(appointmentDTO.getDuration());
 		
 		List<TimeSlotIdView> workingTimeSlots = 
 				timeSlotsRepository.findSlotIdsByStartTimeGreaterThanEqualAndStartTimeLessThanEqual(startTime, endTime);
 		
 		TimeSlotIdView breakTimeSlot = timeSlotsRepository.findSlotIdByStartTime(endTime.plusMinutes(30));
 		
-		for (StaffDTO requiredStaff : appointmentRequestDTO.getRequiredStaff()) {
+		for (StaffDTO requiredStaff : requiredStaffList) {
 			// occupying slots for work
 			for(TimeSlotIdView timeSlot: workingTimeSlots) {
 				StaffOccupancyEntity staffOccupancyEntity = new StaffOccupancyEntity();
 				staffOccupancyEntity.setStaffId(requiredStaff.getStaffId());
 				staffOccupancyEntity.setTimeSlotId(timeSlot.getSlotId());
-				staffOccupancyEntity.setOccupancyDate(appointmentRequestDTO.getAppointmentDate());
+				staffOccupancyEntity.setOccupancyDate(appointmentDTO.getAppointmentDate());
 				staffOccupancyEntity.setOccupancyTypeId(StaffOccupancyType.WORK.getValue());
-				staffOccupancyEntity.setAppointmentId(appointmentId);
+				staffOccupancyEntity.setAppointmentId(appointmentDTO.getAppointmentId());
 				
 				staffOccupancyEntityList.add(staffOccupancyEntity);
 			}
@@ -306,28 +394,28 @@ public class AppointmentService {
 			StaffOccupancyEntity staffOccupancyEntity = new StaffOccupancyEntity();
 			staffOccupancyEntity.setStaffId(requiredStaff.getStaffId());
 			staffOccupancyEntity.setTimeSlotId(breakTimeSlot.getSlotId());
-			staffOccupancyEntity.setOccupancyDate(appointmentRequestDTO.getAppointmentDate());
+			staffOccupancyEntity.setOccupancyDate(appointmentDTO.getAppointmentDate());
 			staffOccupancyEntity.setOccupancyTypeId(StaffOccupancyType.BREAK.getValue());
-			staffOccupancyEntity.setAppointmentId(appointmentId);
+			staffOccupancyEntity.setAppointmentId(appointmentDTO.getAppointmentId());
 			
 			staffOccupancyEntityList.add(staffOccupancyEntity);
 		}
 		
 		
 		List<StaffIdView> allVehicleStaff =
-				staffRepository.findStaffIdByVehicleIdAndIsActive(appointmentRequestDTO.getVehicleId(), true);
+				staffRepository.findStaffIdByVehicleIdAndIsActive(appointmentDTO.getVehicleId(), true);
 		
 		for(StaffIdView vehicleStaff : allVehicleStaff) {
-			if(!containsId(appointmentRequestDTO.getRequiredStaff(), vehicleStaff.getStaffId())) {
+			if(!listContainsId(requiredStaffList, vehicleStaff.getStaffId())) {
 				
 				// as vehicle will be busy driving required staff to location at starting time slot
 				// setting other non working staff of the vehicle to occupied as vehicle is not available in this slot for them
 				StaffOccupancyEntity staffOccupancyEntity = new StaffOccupancyEntity();
 				staffOccupancyEntity.setStaffId(vehicleStaff.getStaffId());
 				staffOccupancyEntity.setTimeSlotId(startingTimeSlot.getSlotId());
-				staffOccupancyEntity.setOccupancyDate(appointmentRequestDTO.getAppointmentDate());
+				staffOccupancyEntity.setOccupancyDate(appointmentDTO.getAppointmentDate());
 				staffOccupancyEntity.setOccupancyTypeId(StaffOccupancyType.VEHICLE_BUSY.getValue());
-				staffOccupancyEntity.setAppointmentId(appointmentId);
+				staffOccupancyEntity.setAppointmentId(appointmentDTO.getAppointmentId());
 				
 				staffOccupancyEntityList.add(staffOccupancyEntity);	
 			}
@@ -338,7 +426,7 @@ public class AppointmentService {
 		};
 	}
 	
-	private boolean containsId(List<StaffDTO> staffList, Integer staffId) {
+	private boolean listContainsId(List<StaffDTO> staffList, Integer staffId) {
 	    return staffList.stream().anyMatch(p -> p.getStaffId().equals(staffId));
 	}
 
@@ -369,14 +457,14 @@ public class AppointmentService {
 	 * @param appointmentEntity
 	 * @return List<AppointmentStaffEntity> 
 	 */
-	private List<AppointmentStaffEntity> prepareAppointmentStaffRelationEntities(
-			CreateAppointmentRequestDTO appointmentRequestDTO, AppointmentEntity appointmentEntity) {
+	private List<AppointmentStaffEntity> prepareAppointmentStaffRelationEntities(Integer appointmentId,
+			List<StaffDTO> requiredStaffList) {
 
 		List<AppointmentStaffEntity> appointmentStaffEntities = new ArrayList<>();
 
-		for (StaffDTO staff : appointmentRequestDTO.getRequiredStaff()) {
+		for (StaffDTO staff : requiredStaffList) {
 			AppointmentStaffEntity appointmentStaffEntity = new AppointmentStaffEntity();
-			appointmentStaffEntity.setAppointmentId(appointmentEntity.getAppointmentId());
+			appointmentStaffEntity.setAppointmentId(appointmentId);
 			appointmentStaffEntity.setStaffId(staff.getStaffId());
 			
 			appointmentStaffEntities.add(appointmentStaffEntity);
@@ -396,7 +484,8 @@ public class AppointmentService {
 		
 		try {
 			
-			List<AppointmentEntity> userAppointmentsEntities = appointmentRepository.findByUserId(userId);
+			List<AppointmentEntity> userAppointmentsEntities =
+					appointmentRepository.findAppointmentWithTimeSlotByUserId(userId);
 			
 			userAppointments = getUserAppointmentDTOFromEntity(userAppointmentsEntities);
 			
@@ -409,6 +498,33 @@ public class AppointmentService {
 		
 		return userAppointments;
 		
+	}
+	
+	/**
+	 * @param userId
+	 * @return list of all appointments booked by this user
+	 */
+	public AppointmentDTO getAppointmentById(Integer appointmentId) {
+				
+		try {
+			
+			Optional<AppointmentEntity> optionalAppointment =
+					appointmentRepository.findAppointmentWithStaffByAppointmentId(appointmentId);
+			
+			if(optionalAppointment.isEmpty()) {
+				return null;
+			}
+			
+			AppointmentDTO appointment = getAppointmentDTOFromEntity(optionalAppointment.get());
+			
+			return appointment;
+			
+		}catch(Exception e) {
+			logs.error("getUserAppointments failed", e);
+		}
+		
+		
+		return null;
 	}
 	
 	private List<UserAppointmentDTO> getUserAppointmentDTOFromEntity(List<AppointmentEntity> userAppointmentsEntities){
@@ -425,10 +541,13 @@ public class AppointmentService {
 			userAppointment.setCreatedDate(appointmentEntity.getCreatedDate());
 			userAppointment.setDuration(appointmentEntity.getDuration());
 			userAppointment.setServiceType(appointmentEntity.getServiceType());
-			userAppointment.setStartTimeSlotId(appointmentEntity.getStartTimeSlotId());
 			userAppointment.setUpdatedDate(appointmentEntity.getUpdatedDate());
 			userAppointment.setUserId(appointmentEntity.getUserId());
 			userAppointment.setVehicleId(appointmentEntity.getVehicleId());
+			
+			if(appointmentEntity.getTimeSlots() != null) {
+				userAppointment.setStartTime(appointmentEntity.getTimeSlots().getSlotName());
+			}
 			
 			userAppointmentsDTO.add(userAppointment);
 		}
@@ -436,4 +555,57 @@ public class AppointmentService {
 		return userAppointmentsDTO;
 	}
 	
+	/**
+	 * Converts appointmentEntity to appointmentDTO
+	 * Also converts nested List<StaffEntity> to List<StaffDTO>
+	 * Creating DTO manually because model mapper is failing to convert nested object
+	 * 
+	 * @param appointmentEntity
+	 * @return AppointmentDTO
+	 */
+	private AppointmentDTO getAppointmentDTOFromEntity(AppointmentEntity appointmentEntity){
+		
+		AppointmentDTO appointmentDTO = new AppointmentDTO();
+			
+		appointmentDTO.setAppointmentId(appointmentEntity.getAppointmentId());
+		appointmentDTO.setAddress(appointmentEntity.getAddress());
+		appointmentDTO.setAppointmentDate(appointmentEntity.getAppointmentDate());
+		appointmentDTO.setCity(appointmentEntity.getCity());
+		appointmentDTO.setCreatedDate(appointmentEntity.getCreatedDate());
+		appointmentDTO.setDuration(appointmentEntity.getDuration());
+		appointmentDTO.setServiceType(appointmentEntity.getServiceType());
+		appointmentDTO.setStartTimeSlotId(appointmentEntity.getStartTimeSlotId());
+		appointmentDTO.setUpdatedDate(appointmentEntity.getUpdatedDate());
+		appointmentDTO.setUserId(appointmentEntity.getUserId());
+		appointmentDTO.setVehicleId(appointmentEntity.getVehicleId());
+		
+		if(appointmentEntity.getStaff() == null) {
+			return appointmentDTO;
+		}
+		
+		List<StaffDTO> staffDTOList = new ArrayList<>();
+		
+		for(StaffEntity staffEntity : appointmentEntity.getStaff()) {
+			
+			StaffDTO staffDTO = this.modelMapper.map(staffEntity, StaffDTO.class);
+			staffDTOList.add(staffDTO);
+		}
+		
+		appointmentDTO.setStaff(staffDTOList);
+		
+		return appointmentDTO;
+	}
+	
+	
+	private List<Integer> getStaffIdsFromAppointmentDTO(AppointmentDTO appointmentDTO){
+		List<Integer> staffIds = new ArrayList<>();
+		
+		List<StaffDTO> staffList = appointmentDTO.getStaff();
+		
+		for(StaffDTO staff : staffList) {
+			staffIds.add(staff.getStaffId());
+		}
+		
+		return staffIds;
+	}
 }

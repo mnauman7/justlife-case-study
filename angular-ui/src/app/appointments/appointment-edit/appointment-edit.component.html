@@ -1,0 +1,96 @@
+<div class="container-fluid">
+  <div class="container xd-container">
+    <h2>Update Appointment</h2>
+    <div *ngIf="errorMessage" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+    <form
+      (ngSubmit)="onSubmit(appointmentForm.value)"
+      #appointmentForm="ngForm"
+      class="form-horizontal"
+    >
+      <div class="form-group" hidden="true">
+        <input
+          type="text"
+          hidden="true"
+          class="form-control"
+          id="id"
+          [(ngModel)]="appointment.appointmentId"
+          name="id"
+        />
+      </div>
+
+      <div
+        class="form-group has-feedback"
+      >
+        <label for="appointmentId" class="col-sm-2 control-label">Appointment ID</label>
+        <div class="col-sm-10">
+          <input
+            type="text"
+            class="form-control"
+            id="appointmentId"
+            [(ngModel)]="appointment.appointmentId"
+            name="appointmentId"
+            disabled
+            #address="ngModel"
+          />
+        </div>
+      </div>
+
+      <div
+      class="form-group has-feedback"
+    >
+      <label for="appointmentId" class="col-sm-2 control-label">Duration (Hours)</label>
+      <div class="col-sm-10">
+        <input
+          type="text"
+          class="form-control"
+          id="duration"
+          [(ngModel)]="appointment.duration"
+          name="duration"
+          disabled
+          #address="ngModel"
+        />
+      </div>
+    </div>
+
+      <div
+      class="form-group has-feedback"
+      >
+        <label for="selectedDate" class="col-sm-2 control-label">Appointment Date</label>
+        <div class="col-sm-10">
+          <input type="date" class="form-control" id="date" name="date" (change)="setAvailableSlotsForTheDate()" [(ngModel)]="selectedDate"/>
+        </div>
+      </div>
+
+      <div
+      class="form-group has-feedback"
+      >
+        <label for="selectedTime" class="col-sm-2 control-label">Appointment Time</label>
+        <div class="col-sm-10">
+          <select id="staff3" name="staff3"  [(ngModel)]="selectedTime">
+            <option *ngFor="let slot of availableSlots" [ngValue]="slot.startingTimeId">
+              {{slot.startingTime}}
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="col-sm-offset-2 col-sm-10">
+          <button class="btn btn-default" (click)="goToAppointmentList()">
+            Back
+          </button>
+          &nbsp;
+          <button
+            type="submit"
+            [disabled]="!appointmentForm.valid"
+            class="btn btn-default"
+          >
+            Update Appointment
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

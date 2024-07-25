@@ -5,6 +5,8 @@ import { Booking } from '../booking';
 import { BookingService } from '../booking.service';
 import { AvailableSlots } from '../available-slots';
 import { AppointmentRequest } from '../appointment-request';
+import { Staff } from '../staff';
+import { CookieService } from 'ngx-cookie-service';
 
 @Component({
   selector: 'app-booking-list',
@@ -18,10 +20,13 @@ export class BookingListComponent implements OnInit {
   availableSlots: AvailableSlots[];
 
   selectedDate: Date;
+  //selectedTime: string;
   serviceHours: number;
+
   numberOfProfessionals: number;
 
-  constructor(private router: Router, private bookingService: BookingService) {
+  constructor(private router: Router, private bookingService: BookingService,
+     private cookieService: CookieService) {
   }
 
   ngOnInit() {
@@ -29,15 +34,15 @@ export class BookingListComponent implements OnInit {
 
   bookAppointment(slot: AvailableSlots) {
     const appointmentRequest: AppointmentRequest = {
-      userId: 1,
+      userId: Number(this.cookieService.get('userId')),
       startingTimeId: slot.startingTimeId,
       duration: slot.duration,
       appointmentDate: slot.date,
-      serviceTypeId: 1,
-      vehicleId: 1,
+      serviceTypeId: 1, //all bookings are cleaning service for now
+      vehicleId: slot.staff1.vehicleId,
       address: "Test place",
       city: "Test City",
-      requiredStaff: slot.availableStaff.slice(0,2)
+      requiredStaff: this.getSelectedStaff(slot)
     };
     
     this.bookingService.createAppointment(appointmentRequest).subscribe(
@@ -49,7 +54,17 @@ export class BookingListComponent implements OnInit {
   }
 
   gotoAppointmentList() {
-    this.router.navigate(['welcome']);
+    this.router.navigate(['appointments']);
+  }
+
+  getSelectedStaff(slot: AvailableSlots) {
+    if(this.numberOfProfessionals == 1){
+      return [slot.staff1];
+    }else if(this.numberOfProfessionals == 2){
+      return [slot.staff1,slot.staff2];
+    }else if(this.numberOfProfessionals == 3){
+      return [slot.staff1,slot.staff2,slot.staff3];
+    }
   }
 
   getAvailableSlots()

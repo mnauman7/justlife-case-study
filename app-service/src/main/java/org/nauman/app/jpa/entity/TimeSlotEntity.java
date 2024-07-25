@@ -1,12 +1,15 @@
 package org.nauman.app.jpa.entity;
 
 import java.time.LocalTime;
+import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,6 +29,9 @@ public class TimeSlotEntity {
 	
     @Column(name = "slot_name", nullable = false)
 	private String slotName;
+    
+	@OneToMany(mappedBy = "timeSlot", fetch = FetchType.LAZY)
+    private List<StaffOccupancyEntity> staffOccupancy;
 
     
 	public Integer getSlotId() {
@@ -59,6 +65,13 @@ public class TimeSlotEntity {
 	public void setSlotName(String slotName) {
 		this.slotName = slotName;
 	}
-	
+
+	public List<StaffOccupancyEntity> getStaffOccupancy() {
+		return staffOccupancy;
+	}
+
+	public void setStaffOccupancy(List<StaffOccupancyEntity> staffOccupancy) {
+		this.staffOccupancy = staffOccupancy;
+	}
 	
 }

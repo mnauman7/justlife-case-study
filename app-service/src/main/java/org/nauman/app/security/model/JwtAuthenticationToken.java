@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 
 /**
  * Authentication object which is used by JwtAuthenticationFilter to let AuthenticationFilter know if
- * Jwt validation was successfull or not
+ * Jwt validation was successful or not
  */
 public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken {
 

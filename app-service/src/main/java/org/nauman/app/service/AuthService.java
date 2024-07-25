@@ -38,6 +38,6 @@ public class AuthService {
 		
 		String token = JwtUtils.createJwt(userLogin.getId().toString());
 		
-		return new LoginResponseDTO(token);
+		return new LoginResponseDTO(token,userLogin.getId());
 	}
 }
