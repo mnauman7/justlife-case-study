@@ -28,7 +28,7 @@
     "core-js": "^3.32.1",
     "jquery": "^3.3.1",
     "moment": "^2.29.4",
-    "ngx-cookie-service": "^18.0.0",
+    "ngx-cookie-service": "^16.0.0",
     "rxjs": "^6.3.1",
     "tether": "^1.4.4",
     "tslib": "^2.0.0",
