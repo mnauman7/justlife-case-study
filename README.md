@@ -28,6 +28,7 @@ mvn clean install -P buildDocker
 2). Build angular-ui docker image (frontend UI) </br>
 Go to angular-ui dir and run command: 
 ````
+npm install
 ng build
 docker build -t justlife-case-study-angular:latest .
 ````
