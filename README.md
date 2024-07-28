@@ -54,3 +54,11 @@ docker compose up app-server -d
 ````
 
 Note: App server is dependent on MySql db, so please wait few mins for db-server container to be ready before starting app-server container.
+
+&nbsp;
+&nbsp;
+
+<b>Once all the docker containers are up, access application using following URL:</b> </br>
+````
+http://localhost:4000/
+````
