@@ -19,13 +19,13 @@ Application screenshots:
 
 <b>Steps to build docker images:</b>
 
-1). Build app-service docker image (java, backend)
+1). Build app-service docker image (java, backend) </br>
 Go to app-service dir and run command:
 ````
 mvn clean install -P buildDocker
 ````
 
-2). Build angular-ui docker image (frontend UI)
+2). Build angular-ui docker image (frontend UI) </br>
 Go to angular-ui dir and run command: 
 ````
 ng build
